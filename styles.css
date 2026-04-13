@@ -169,11 +169,8 @@ body {
 }
 
 .category-body {
-  padding: 18px;
-
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .slot-window {
@@ -225,14 +222,9 @@ body {
   font-size: 26px;
   line-height: 1.1;
   font-weight: 800;
-  letter-spacing: -0.02em;
-
-  margin-bottom: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(0,0,0,0.12);
 
   display: -webkit-box;
-  -webkit-line-clamp: 3;   /* max 3 Zeilen */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 
@@ -258,11 +250,7 @@ body {
 }
 
 .card-controls {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-
-  margin-top: auto; /
+  margin-top: auto;
 }
 
 .selection-wrapper {
