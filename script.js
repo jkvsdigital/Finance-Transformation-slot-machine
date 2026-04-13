@@ -1,10 +1,5 @@
 const SHEET_NAME = "Links";
-const SPIN_SPEED = 110;
 const CENTRAL_EXCEL_PATH = "data/links.xlsx";
-
-/*
-  Nur Frontend-Schutz bei GitHub Pages.
-*/
 const ADMIN_PASSWORD = "ChangeThis123!";
 
 const CATEGORY_CONFIG = {
@@ -31,49 +26,55 @@ const FALLBACK_DATA = [
     author: "Demo Source",
     title: "Digital Innovation Overview",
     url: "https://example.com/digitalization",
-    type: "text"
+    type: "text",
+    active: true
   },
   {
     category: "Finance Transformation",
     author: "Demo Source",
     title: "Future of Finance",
     url: "https://example.com/finance",
-    type: "video"
+    type: "video",
+    active: true
   },
   {
     category: "Smart Work",
     author: "Demo Source",
     title: "Smart Collaboration Models",
     url: "https://example.com/smartwork",
-    type: "podcast"
+    type: "podcast",
+    active: true
   },
   {
     category: "International",
     author: "Demo Source",
     title: "Global Market Signals",
     url: "https://example.com/international",
-    type: "text"
+    type: "text",
+    active: true
   },
   {
     category: "Mindset",
     author: "Demo Source",
     title: "Growth Mindset Basics",
     url: "https://example.com/mindset",
-    type: "video"
+    type: "video",
+    active: true
   },
   {
     category: "(Automotive) Future",
     author: "Demo Source",
     title: "Mobility 2030",
     url: "https://example.com/future",
-    type: "text"
+    type: "text",
+    active: true
   }
 ];
 
 const state = {
   grouped: {},
-  timers: new Map(),
   selected: new Map(),
+  spinControllers: new Map(),
   isUnlocked: false
 };
 
@@ -98,14 +99,16 @@ const statusBar = document.getElementById("statusBar");
 
 startAllBtn.addEventListener("click", startAll);
 stopAllBtn.addEventListener("click", stopAll);
-continueAllBtn.addEventListener("click", startAll);
+continueAllBtn.addEventListener("click", resumeAll);
 
 toggleAdminBtn.addEventListener("click", toggleAdminPanel);
 unlockBtn.addEventListener("click", unlockAdmin);
 lockBtn.addEventListener("click", lockAdmin);
+
 passwordInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") unlockAdmin();
 });
+
 excelFile.addEventListener("change", handleExcelUpload);
 
 init();
@@ -130,7 +133,7 @@ function unlockAdmin() {
     authMessage.textContent = "";
     passwordInput.value = "";
   } else {
-    authMessage.textContent = "Passwort nicht korrekt.";
+    authMessage.textContent = "Password not correct.";
   }
 }
 
@@ -145,7 +148,7 @@ function lockAdmin() {
 
 async function loadCentralExcel() {
   try {
-    setStatus("Lade zentrale Excel-Datei ...");
+    setStatus("Loading central Excel file ...");
 
     const response = await fetch(CENTRAL_EXCEL_PATH, { cache: "no-store" });
     if (!response.ok) {
@@ -155,10 +158,10 @@ async function loadCentralExcel() {
     const buffer = await response.arrayBuffer();
     const rows = parseWorkbook(buffer);
     applyRows(rows);
-    setStatus("Zentrale Excel-Datei geladen.");
+    setStatus("Central Excel file loaded.");
   } catch (error) {
     console.error(error);
-    setStatus("Zentrale Excel-Datei konnte nicht geladen werden. Demo-Daten werden angezeigt.");
+    setStatus("Central Excel file could not be loaded. Fallback data is shown.");
   }
 }
 
@@ -167,14 +170,14 @@ async function handleExcelUpload(event) {
   if (!file || !state.isUnlocked) return;
 
   try {
-    setStatus(`Teste ${file.name} ...`);
+    setStatus(`Testing ${file.name} ...`);
     const buffer = await file.arrayBuffer();
     const rows = parseWorkbook(buffer);
     applyRows(rows);
-    setStatus(`${file.name} erfolgreich geladen. Nur diese Sitzung sieht den Override.`);
+    setStatus(`${file.name} loaded for this session only.`);
   } catch (error) {
     console.error(error);
-    setStatus("Die Excel-Datei konnte nicht verarbeitet werden.");
+    setStatus("The Excel file could not be processed.");
   }
 }
 
@@ -183,7 +186,7 @@ function parseWorkbook(buffer) {
   const worksheet = workbook.Sheets[SHEET_NAME];
 
   if (!worksheet) {
-    throw new Error(`Kein Blatt "${SHEET_NAME}" gefunden.`);
+    throw new Error(`Sheet "${SHEET_NAME}" not found.`);
   }
 
   const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
@@ -191,13 +194,14 @@ function parseWorkbook(buffer) {
   const preparedRows = normalizedRows.filter(isValidRow);
 
   if (!preparedRows.length) {
-    throw new Error("Keine gültigen aktiven Zeilen gefunden.");
+    throw new Error("No valid active rows found.");
   }
 
   return preparedRows;
 }
 
 function applyRows(rows) {
+  stopAll(true);
   state.grouped = groupByCategory(rows);
   renderApp();
 }
@@ -246,7 +250,6 @@ function groupByCategory(rows) {
 }
 
 function renderApp() {
-  stopAll();
   categoriesGrid.innerHTML = "";
   state.selected.clear();
 
@@ -277,6 +280,7 @@ function renderApp() {
       resultCard.href = row.url;
       resultAuthor.textContent = row.author;
       resultTitle.textContent = row.title;
+      resultTitle.title = row.title;
       typeIcon.textContent = getTypeIcon(row.type);
       typeLabel.textContent = formatType(row.type);
       state.selected.set(category, row);
@@ -290,34 +294,12 @@ function renderApp() {
 
     startBtn.addEventListener("click", () => startSpin(category));
     stopBtn.addEventListener("click", () => stopSpin(category));
-    continueBtn.addEventListener("click", () => startSpin(category));
+    continueBtn.addEventListener("click", () => resumeSpin(category));
 
     categoriesGrid.appendChild(node);
   });
 
   renderFinalSelection();
-}
-
-function startSpin(category) {
-  const items = state.grouped[category] || [];
-  if (!items.length) return;
-
-  stopSpin(category);
-
-  const timer = setInterval(() => {
-    const nextItem = items[Math.floor(Math.random() * items.length)];
-    paintCategory(category, nextItem);
-  }, SPIN_SPEED);
-
-  state.timers.set(category, timer);
-}
-
-function stopSpin(category) {
-  const timer = state.timers.get(category);
-  if (timer) {
-    clearInterval(timer);
-    state.timers.delete(category);
-  }
 }
 
 function startAll() {
@@ -328,19 +310,149 @@ function startAll() {
   });
 }
 
-function stopAll() {
-  for (const timer of state.timers.values()) {
-    clearInterval(timer);
+function resumeAll() {
+  CATEGORY_ORDER.forEach((category) => {
+    if ((state.grouped[category] || []).length) {
+      resumeSpin(category);
+    }
+  });
+}
+
+function stopAll(immediate = false) {
+  CATEGORY_ORDER.forEach((category) => {
+    stopSpin(category, immediate);
+  });
+}
+
+function resumeSpin(category) {
+  startSpin(category);
+}
+
+function startSpin(category) {
+  const items = state.grouped[category] || [];
+  if (!items.length) return;
+
+  clearSpin(category);
+
+  const cardEl = getCategoryCard(category);
+  cardEl?.classList.remove("winner");
+  cardEl?.classList.add("spinning");
+
+  const controller = {
+    timeoutId: null,
+    isStopping: false,
+    isActive: true,
+    speed: 70,
+    step: 0
+  };
+
+  state.spinControllers.set(category, controller);
+
+  runSpinLoop(category);
+}
+
+function runSpinLoop(category) {
+  const controller = state.spinControllers.get(category);
+  const items = state.grouped[category] || [];
+
+  if (!controller || !controller.isActive || !items.length) return;
+
+  const nextItem = items[Math.floor(Math.random() * items.length)];
+  paintCategory(category, nextItem);
+
+  if (controller.isStopping) {
+    controller.step += 1;
+    controller.speed = Math.min(controller.speed + getSlowdownIncrement(controller.step), 360);
   }
-  state.timers.clear();
+
+  controller.timeoutId = window.setTimeout(() => {
+    if (!controller.isActive) return;
+
+    if (controller.isStopping && controller.speed >= 340) {
+      finalizeSpin(category);
+      return;
+    }
+
+    runSpinLoop(category);
+  }, controller.speed);
+}
+
+function getSlowdownIncrement(step) {
+  if (step < 3) return 20;
+  if (step < 6) return 28;
+  if (step < 9) return 36;
+  return 48;
+}
+
+function stopSpin(category, immediate = false) {
+  const controller = state.spinControllers.get(category);
+  if (!controller) return;
+
+  if (immediate) {
+    finalizeSpin(category, true);
+    return;
+  }
+
+  controller.isStopping = true;
+}
+
+function finalizeSpin(category, immediate = false) {
+  const controller = state.spinControllers.get(category);
+  const items = state.grouped[category] || [];
+  const cardEl = getCategoryCard(category);
+
+  if (controller?.timeoutId) {
+    clearTimeout(controller.timeoutId);
+  }
+
+  if (items.length) {
+    const finalItem = items[Math.floor(Math.random() * items.length)];
+    paintCategory(category, finalItem);
+  }
+
+  if (controller) {
+    controller.isActive = false;
+  }
+
+  state.spinControllers.delete(category);
+
+  cardEl?.classList.remove("spinning");
+  cardEl?.classList.add("winner");
+
+  if (!immediate) {
+    window.setTimeout(() => {
+      cardEl?.classList.remove("winner");
+    }, 1100);
+  } else {
+    cardEl?.classList.remove("winner");
+  }
+}
+
+function clearSpin(category) {
+  const existing = state.spinControllers.get(category);
+  if (!existing) return;
+
+  if (existing.timeoutId) {
+    clearTimeout(existing.timeoutId);
+  }
+
+  existing.isActive = false;
+  state.spinControllers.delete(category);
+
+  const cardEl = getCategoryCard(category);
+  cardEl?.classList.remove("spinning");
+  cardEl?.classList.remove("winner");
 }
 
 function paintCategory(category, row) {
-  const card = [...document.querySelectorAll(".category-card")]
-    .find((el) => el.dataset.category === category);
-
+  const card = getCategoryCard(category);
   if (!card || !card._renderRow) return;
   card._renderRow(row);
+}
+
+function getCategoryCard(category) {
+  return [...document.querySelectorAll(".category-card")]
+    .find((el) => el.dataset.category === category);
 }
 
 function renderFinalSelection() {
