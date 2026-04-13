@@ -98,7 +98,7 @@ const authMessage = document.getElementById("authMessage");
 const statusBar = document.getElementById("statusBar");
 
 startAllBtn.addEventListener("click", startAll);
-stopAllBtn.addEventListener("click", stopAll);
+stopAllBtn.addEventListener("click", () => stopAll(false));
 continueAllBtn.addEventListener("click", resumeAll);
 
 toggleAdminBtn.addEventListener("click", toggleAdminPanel);
@@ -243,13 +243,16 @@ function parseActive(value) {
 
 function groupByCategory(rows) {
   const grouped = {};
+
   CATEGORY_ORDER.forEach((category) => {
     grouped[category] = rows.filter((row) => row.category === category);
   });
+
   return grouped;
 }
 
 function renderApp() {
+  stopAll(true);
   categoriesGrid.innerHTML = "";
   state.selected.clear();
 
@@ -293,7 +296,7 @@ function renderApp() {
     renderRow(firstRow);
 
     startBtn.addEventListener("click", () => startSpin(category));
-    stopBtn.addEventListener("click", () => stopSpin(category));
+    stopBtn.addEventListener("click", () => stopSpin(category, false));
     continueBtn.addEventListener("click", () => resumeSpin(category));
 
     categoriesGrid.appendChild(node);
@@ -313,7 +316,7 @@ function startAll() {
 function resumeAll() {
   CATEGORY_ORDER.forEach((category) => {
     if ((state.grouped[category] || []).length) {
-      resumeSpin(category);
+      startSpin(category);
     }
   });
 }
@@ -340,48 +343,51 @@ function startSpin(category) {
 
   const controller = {
     timeoutId: null,
-    isStopping: false,
     isActive: true,
-    speed: 70,
-    step: 0
+    isStopping: false,
+    currentIndex: Math.floor(Math.random() * items.length),
+    currentDelay: 70,
+    stopStepsRemaining: 0
   };
 
   state.spinControllers.set(category, controller);
-
-  runSpinLoop(category);
+  spinStep(category);
 }
 
-function runSpinLoop(category) {
+function spinStep(category) {
   const controller = state.spinControllers.get(category);
   const items = state.grouped[category] || [];
 
   if (!controller || !controller.isActive || !items.length) return;
 
-  const nextItem = items[Math.floor(Math.random() * items.length)];
-  paintCategory(category, nextItem);
+  controller.currentIndex = (controller.currentIndex + 1) % items.length;
+  const currentItem = items[controller.currentIndex];
+  paintCategory(category, currentItem);
 
   if (controller.isStopping) {
-    controller.step += 1;
-    controller.speed = Math.min(controller.speed + getSlowdownIncrement(controller.step), 360);
+    controller.stopStepsRemaining -= 1;
+    controller.currentDelay = Math.min(
+      controller.currentDelay + getSlowdownDelay(controller.stopStepsRemaining),
+      420
+    );
+
+    if (controller.stopStepsRemaining <= 0) {
+      finishSpin(category);
+      return;
+    }
   }
 
   controller.timeoutId = window.setTimeout(() => {
-    if (!controller.isActive) return;
-
-    if (controller.isStopping && controller.speed >= 340) {
-      finalizeSpin(category);
-      return;
-    }
-
-    runSpinLoop(category);
-  }, controller.speed);
+    spinStep(category);
+  }, controller.currentDelay);
 }
 
-function getSlowdownIncrement(step) {
-  if (step < 3) return 20;
-  if (step < 6) return 28;
-  if (step < 9) return 36;
-  return 48;
+function getSlowdownDelay(stepsRemaining) {
+  if (stepsRemaining > 10) return 10;
+  if (stepsRemaining > 7) return 18;
+  if (stepsRemaining > 5) return 28;
+  if (stepsRemaining > 3) return 40;
+  return 60;
 }
 
 function stopSpin(category, immediate = false) {
@@ -389,31 +395,27 @@ function stopSpin(category, immediate = false) {
   if (!controller) return;
 
   if (immediate) {
-    finalizeSpin(category, true);
+    finishSpin(category, true);
     return;
   }
 
+  if (controller.isStopping) return;
+
   controller.isStopping = true;
+  controller.stopStepsRemaining = 12;
 }
 
-function finalizeSpin(category, immediate = false) {
+function finishSpin(category, immediate = false) {
   const controller = state.spinControllers.get(category);
-  const items = state.grouped[category] || [];
   const cardEl = getCategoryCard(category);
 
-  if (controller?.timeoutId) {
+  if (!controller) return;
+
+  if (controller.timeoutId) {
     clearTimeout(controller.timeoutId);
   }
 
-  if (items.length) {
-    const finalItem = items[Math.floor(Math.random() * items.length)];
-    paintCategory(category, finalItem);
-  }
-
-  if (controller) {
-    controller.isActive = false;
-  }
-
+  controller.isActive = false;
   state.spinControllers.delete(category);
 
   cardEl?.classList.remove("spinning");
@@ -422,7 +424,7 @@ function finalizeSpin(category, immediate = false) {
   if (!immediate) {
     window.setTimeout(() => {
       cardEl?.classList.remove("winner");
-    }, 1100);
+    }, 1000);
   } else {
     cardEl?.classList.remove("winner");
   }
