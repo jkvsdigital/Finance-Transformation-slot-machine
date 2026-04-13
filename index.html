@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Research Sharing Slot Machine</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <main class="app-shell">
@@ -28,6 +29,47 @@
         <h2>Deine aktuelle Auswahl</h2>
       </div>
       <div id="finalSelection" class="final-selection"></div>
+    </section>
+
+    <section class="admin-zone">
+      <div class="admin-zone-inner">
+        <button id="toggleAdminBtn" class="admin-toggle">Admin</button>
+
+        <div id="adminPanel" class="admin-panel hidden">
+          <div id="authPanel" class="auth-panel">
+            <h3>Geschützter Bereich</h3>
+            <p>Nur für das Aktualisieren der Excel-Daten.</p>
+            <div class="auth-row">
+              <input
+                id="passwordInput"
+                type="password"
+                placeholder="Passwort eingeben"
+                class="password-input"
+              />
+              <button id="unlockBtn" class="btn btn-primary">Freischalten</button>
+            </div>
+            <div id="authMessage" class="admin-message"></div>
+          </div>
+
+          <div id="uploadPanel" class="upload-panel hidden">
+            <h3>Excel hochladen</h3>
+            <p class="upload-hint">
+              Erwartet wird ein Blatt mit dem Namen <strong>Links</strong>.
+            </p>
+
+            <label class="upload-box">
+              <span>Excel-Datei auswählen</span>
+              <input type="file" id="excelFile" accept=".xlsx,.xls" />
+            </label>
+
+            <div class="upload-actions">
+              <button id="lockBtn" class="btn btn-secondary">Wieder sperren</button>
+            </div>
+
+            <div id="statusBar" class="admin-message"></div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -62,7 +104,6 @@
     </article>
   </template>
 
-  <script src="data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
