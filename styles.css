@@ -1,0 +1,352 @@
+:root {
+  --bg-1: #0b0e14;
+  --bg-2: #141923;
+  --panel: rgba(255, 255, 255, 0.08);
+  --panel-strong: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f6f8fb;
+  --muted: rgba(246, 248, 251, 0.72);
+  --card-text: #111111;
+  --card-bg: #e9eaec;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+
+  --digitalization: #2f7f7b;
+  --finance: #4d9f9c;
+  --smartwork: #089548;
+  --international: #1179b6;
+  --mindset: #6f1b67;
+  --future: #0b2b6a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(255,255,255,0.06), transparent 22%),
+    linear-gradient(135deg, var(--bg-1), var(--bg-2));
+  color: var(--text);
+}
+
+body {
+  padding: 32px 20px 50px;
+}
+
+.app-shell {
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(36px, 6vw, 72px);
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.hero p {
+  margin: 14px 0 0;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.global-controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 34px;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  padding: 12px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  backdrop-filter: blur(12px);
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.14);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ffffff, #d9dde5);
+  color: #101218;
+  border-color: transparent;
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.08);
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.category-card {
+  overflow: hidden;
+  border-radius: 26px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.category-header {
+  position: relative;
+  height: 235px;
+  overflow: hidden;
+}
+
+.category-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.category-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.72;
+}
+
+.category-label-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 18px;
+  z-index: 2;
+}
+
+.category-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  max-width: 90%;
+  text-shadow: 0 3px 12px rgba(0,0,0,0.2);
+}
+
+.category-body {
+  padding: 18px;
+}
+
+.slot-window {
+  min-height: 235px;
+  padding: 14px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.12);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.result-card {
+  width: 100%;
+  display: block;
+  text-decoration: none;
+  background: var(--card-bg);
+  color: var(--card-text);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 12px 24px rgba(0,0,0,0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.result-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 16px 28px rgba(0,0,0,0.12);
+}
+
+.result-author {
+  font-size: 15px;
+  color: #303846;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+
+.result-title {
+  min-height: 82px;
+  font-size: 30px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+
+.result-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #232a36;
+}
+
+.type-icon {
+  font-size: 22px;
+}
+
+.card-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.selection-wrapper {
+  margin-top: 34px;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.selection-kicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.selection-header h2 {
+  margin: 8px 0 0;
+  font-size: 28px;
+}
+
+.final-selection {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.final-item {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--line);
+}
+
+.final-item h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.final-item a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.final-item .meta {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.category-card[data-category="Digitalization"] .category-overlay {
+  background: var(--digitalization);
+}
+
+.category-card[data-category="Finance Transformation"] .category-overlay {
+  background: var(--finance);
+}
+
+.category-card[data-category="Smart Work"] .category-overlay {
+  background: var(--smartwork);
+}
+
+.category-card[data-category="International"] .category-overlay {
+  background: var(--international);
+}
+
+.category-card[data-category="Mindset"] .category-overlay {
+  background: var(--mindset);
+}
+
+.category-card[data-category="(Automotive) Future"] .category-overlay {
+  background: var(--future);
+}
+
+@media (max-width: 1180px) {
+  .categories-grid,
+  .final-selection {
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    padding: 20px 14px 36px;
+  }
+
+  .categories-grid,
+  .final-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .category-header {
+    height: 200px;
+  }
+
+  .result-title {
+    font-size: 24px;
+    min-height: auto;
+  }
+}
