@@ -170,16 +170,23 @@ body {
 
 .category-body {
   padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .slot-window {
-  min-height: 235px;
+  height: 260px; /* FIXE Höhe */
   padding: 14px;
   border-radius: 20px;
+
   background:
     linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.08));
+
   border: 1px solid rgba(255,255,255,0.12);
   margin-bottom: 14px;
+
   display: flex;
   align-items: center;
 }
@@ -215,14 +222,26 @@ body {
 }
 
 .result-title {
-  min-height: 82px;
-  font-size: 30px;
-  line-height: 1.05;
+  font-size: 26px;
+  line-height: 1.1;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+
   margin-bottom: 14px;
-  padding-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(0,0,0,0.12);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;   /* max 3 Zeilen */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  min-height: 80px;
+}
+
+ .result-title:hover {
+  overflow: visible;
+  -webkit-line-clamp: unset;
 }
 
 .result-meta {
@@ -242,6 +261,8 @@ body {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+
+  margin-top: auto; /
 }
 
 .selection-wrapper {
