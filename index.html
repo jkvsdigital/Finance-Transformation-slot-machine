@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research Sharing Slot Machine</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div class="hero-badge">Research Sharing</div>
+      <h1>Slot Machine</h1>
+      <p>Inspiration per Kategorie. Drehen, stoppen, auswählen.</p>
+    </section>
+
+    <section class="global-controls">
+      <button id="startAllBtn" class="btn btn-primary">Alle starten</button>
+      <button id="stopAllBtn" class="btn btn-secondary">Alle stoppen</button>
+      <button id="continueAllBtn" class="btn btn-secondary">Alle weiter</button>
+    </section>
+
+    <section id="categoriesGrid" class="categories-grid"></section>
+
+    <section class="selection-wrapper">
+      <div class="selection-header">
+        <span class="selection-kicker">Current Picks</span>
+        <h2>Deine aktuelle Auswahl</h2>
+      </div>
+      <div id="finalSelection" class="final-selection"></div>
+    </section>
+  </main>
+
+  <template id="categoryTemplate">
+    <article class="category-card">
+      <div class="category-header">
+        <img class="category-image" alt="" />
+        <div class="category-overlay"></div>
+        <div class="category-label-wrap">
+          <h3 class="category-title"></h3>
+        </div>
+      </div>
+
+      <div class="category-body">
+        <div class="slot-window">
+          <a class="result-card" href="#" target="_blank" rel="noopener noreferrer">
+            <div class="result-author"></div>
+            <div class="result-title"></div>
+            <div class="result-meta">
+              <span class="type-icon"></span>
+              <span class="type-label"></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="card-controls">
+          <button class="btn start-btn">Start</button>
+          <button class="btn stop-btn">Stop</button>
+          <button class="btn continue-btn">Weiter</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
