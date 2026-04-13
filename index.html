@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-   <meta charset="UTF-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Finance Transformation Learning Slot Machine</title>
   <meta name="description" content="Spin, explore and discover curated content across categories." />
@@ -18,7 +18,7 @@
   <main class="app-shell">
     <section class="hero">
       <div class="hero-badge">Research Sharing</div>
-      <h1>Finance Transformation - Learning Slot Machine</h1>
+      <h1>Finance Transformation Learning Slot Machine</h1>
       <p>Spin, explore and discover curated content across categories.</p>
     </section>
 
@@ -33,7 +33,7 @@
     <section class="selection-wrapper">
       <div class="selection-header">
         <span class="selection-kicker">Current Picks</span>
-        <h2>Your selection</h2>
+        <h2>Your Selection</h2>
       </div>
       <div id="finalSelection" class="final-selection"></div>
     </section>
@@ -44,33 +44,33 @@
 
         <div id="adminPanel" class="admin-panel hidden">
           <div id="authPanel" class="auth-panel">
-            <h3>Geschützter Bereich</h3>
-            <p>Nur für das Aktualisieren der Excel-Daten.</p>
+            <h3>Restricted Area</h3>
+            <p>For updating the Excel data only.</p>
             <div class="auth-row">
               <input
                 id="passwordInput"
                 type="password"
-                placeholder="Passwort eingeben"
+                placeholder="Enter password"
                 class="password-input"
               />
-              <button id="unlockBtn" class="btn btn-primary">Freischalten</button>
+              <button id="unlockBtn" class="btn btn-primary">Unlock</button>
             </div>
             <div id="authMessage" class="admin-message"></div>
           </div>
 
           <div id="uploadPanel" class="upload-panel hidden">
-            <h3>Excel hochladen</h3>
+            <h3>Upload Excel File</h3>
             <p class="upload-hint">
-              Erwartet wird ein Blatt mit dem Namen <strong>Links</strong>.
+              Expected sheet name: <strong>Links</strong>.
             </p>
 
             <label class="upload-box">
-              <span>Excel-Datei auswählen</span>
+              <span>Select Excel File</span>
               <input type="file" id="excelFile" accept=".xlsx,.xls" />
             </label>
 
             <div class="upload-actions">
-              <button id="lockBtn" class="btn btn-secondary">Wieder sperren</button>
+              <button id="lockBtn" class="btn btn-secondary">Lock Again</button>
             </div>
 
             <div id="statusBar" class="admin-message"></div>
