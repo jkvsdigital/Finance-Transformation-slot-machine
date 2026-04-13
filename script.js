@@ -1,32 +1,19 @@
 const SHEET_NAME = "Links";
 const SPIN_SPEED = 110;
+const CENTRAL_EXCEL_PATH = "data/links.xlsx";
 
 /*
-  Achtung:
-  Dieser Passwortschutz ist für GitHub Pages nur ein Frontend-Schutz.
-  Für echte Sicherheit wäre ein Backend nötig.
+  Nur Frontend-Schutz bei GitHub Pages.
 */
 const ADMIN_PASSWORD = "ChangeThis123!";
 
 const CATEGORY_CONFIG = {
-  "Digitalization": {
-    image: "assets/digitalization.png"
-  },
-  "Finance Transformation": {
-    image: "assets/finance-transformation.png"
-  },
-  "Smart Work": {
-    image: "assets/smart-work.png"
-  },
-  "International": {
-    image: "assets/international.png"
-  },
-  "Mindset": {
-    image: "assets/mindset.png"
-  },
-  "(Automotive) Future": {
-    image: "assets/automotive-future.png"
-  }
+  "Digitalization": { image: "assets/digitalization.png" },
+  "Finance Transformation": { image: "assets/finance-transformation.png" },
+  "Smart Work": { image: "assets/smart-work.png" },
+  "International": { image: "assets/international.png" },
+  "Mindset": { image: "assets/mindset.png" },
+  "(Automotive) Future": { image: "assets/automotive-future.png" }
 };
 
 const CATEGORY_ORDER = [
@@ -117,17 +104,16 @@ toggleAdminBtn.addEventListener("click", toggleAdminPanel);
 unlockBtn.addEventListener("click", unlockAdmin);
 lockBtn.addEventListener("click", lockAdmin);
 passwordInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    unlockAdmin();
-  }
+  if (event.key === "Enter") unlockAdmin();
 });
 excelFile.addEventListener("change", handleExcelUpload);
 
 init();
 
-function init() {
+async function init() {
   state.grouped = groupByCategory(FALLBACK_DATA);
   renderApp();
+  await loadCentralExcel();
 }
 
 function toggleAdminPanel() {
@@ -157,38 +143,63 @@ function lockAdmin() {
   statusBar.textContent = "";
 }
 
+async function loadCentralExcel() {
+  try {
+    setStatus("Lade zentrale Excel-Datei ...");
+
+    const response = await fetch(CENTRAL_EXCEL_PATH, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+    const rows = parseWorkbook(buffer);
+    applyRows(rows);
+    setStatus("Zentrale Excel-Datei geladen.");
+  } catch (error) {
+    console.error(error);
+    setStatus("Zentrale Excel-Datei konnte nicht geladen werden. Demo-Daten werden angezeigt.");
+  }
+}
+
 async function handleExcelUpload(event) {
   const file = event.target.files?.[0];
   if (!file || !state.isUnlocked) return;
 
   try {
-    setStatus(`Lade ${file.name} ...`);
-
+    setStatus(`Teste ${file.name} ...`);
     const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer);
-    const worksheet = workbook.Sheets[SHEET_NAME];
-
-    if (!worksheet) {
-      setStatus(`Kein Blatt mit dem Namen "${SHEET_NAME}" gefunden.`);
-      return;
-    }
-
-    const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-    const normalizedRows = normalizeRows(rows);
-    const preparedRows = normalizedRows.filter(isValidRow);
-
-    if (!preparedRows.length) {
-      setStatus("Keine gültigen aktiven Zeilen gefunden.");
-      return;
-    }
-
-    state.grouped = groupByCategory(preparedRows);
-    renderApp();
-    setStatus(`${file.name} erfolgreich geladen.`);
+    const rows = parseWorkbook(buffer);
+    applyRows(rows);
+    setStatus(`${file.name} erfolgreich geladen. Nur diese Sitzung sieht den Override.`);
   } catch (error) {
     console.error(error);
     setStatus("Die Excel-Datei konnte nicht verarbeitet werden.");
   }
+}
+
+function parseWorkbook(buffer) {
+  const workbook = XLSX.read(buffer);
+  const worksheet = workbook.Sheets[SHEET_NAME];
+
+  if (!worksheet) {
+    throw new Error(`Kein Blatt "${SHEET_NAME}" gefunden.`);
+  }
+
+  const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+  const normalizedRows = normalizeRows(rows);
+  const preparedRows = normalizedRows.filter(isValidRow);
+
+  if (!preparedRows.length) {
+    throw new Error("Keine gültigen aktiven Zeilen gefunden.");
+  }
+
+  return preparedRows;
+}
+
+function applyRows(rows) {
+  state.grouped = groupByCategory(rows);
+  renderApp();
 }
 
 function setStatus(message) {
@@ -228,11 +239,9 @@ function parseActive(value) {
 
 function groupByCategory(rows) {
   const grouped = {};
-
   CATEGORY_ORDER.forEach((category) => {
     grouped[category] = rows.filter((row) => row.category === category);
   });
-
   return grouped;
 }
 
